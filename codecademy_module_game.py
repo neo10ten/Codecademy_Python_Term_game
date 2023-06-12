@@ -6,45 +6,84 @@
 import random
 
 
-# Create class for player to use in game:
+
+def programme_start():
+    player_name = ''
+    input_start = input ('--> Type "start" and press enter to begin a new game: ')
+    while input_start != 'start':
+        input_start = input ('--> Type "start" and press enter to begin a new game: ')
+    else:
+        player_name = input ('--> Now, type your name and press enter to start your Journey: ')
+        while player_name == '':
+            player_name = input ('--> I said, type your name and press enter to start your Journey: ')
+        else:
+            return player_name.title()
+
+# Create class for Player in game:
 
 class Player:
-    def __init__(self, player):
-        self.name = ''
-        self.life_container = 0
+    
+    def __init__(self, name):
+        self.player = 'Player 1'
+        self.name = name
+        self.life = 10
         self.item_container = []
-        self.player = player
-        Player.player_name_input()
-
+        
     def __repr__(self):
-        print('Well done, you made it this far. Now finish the bloody code!')
-    def player_name_input():
-        print ('What is your name?')
-        name_input = input ('Type your name and press enter: ')
-        while name_input != '':
-            Player.name.append(name_input)
-            print(Player())
-            Game.journey_trigger()
-        else:
-            name_input = input ('You must speak to be heard. Tell me your name: ')
+        return ('''
+        --> Welcome {name} to the start of your Journey!
+            From here you will be faced with a series of questions that will give you to all Elementis.
+            As is the way of All, you shall be given {life} lives and an item container to complete your journey.
+            Your item container currently contains {number} items.
+            Once it has been loaded with all items of the Elementis, you shall see the Truths of the Elementis.
+        '''.format(name = self.name, life = self.life, number = len(self.item_container)))
 
-# Create class for game - will contain main bulk of code:
+    def store_reward(self, elementis_reward):
+        self.items.append(elementis_reward)
+
+    def lose_a_life(self):
+        self.life -= 1
+        if self.life > 0:
+            print('--> You now have {lives} lives remaining.'.format(lives = self.life))
+        else:
+            print('''
+            --> GAME OVER!
+                Better luck next time =}''')
+
+# Create class for Elementis:
+class Elementis:
+    
+    def __init__(self, elementis):
+        self.name = elementis_dict[elementis]['name']
+        self.question = elementis_dict[elementis]['question']
+        self.answers = elementis_dict[elementis]['answers']
+        self.correct_answer = elementis_dict[elementis]['correct answer']
+        self.reward = elementis_dict[elementis]['reward']
+    
+    def __repr__(self):
+        return ('--> This Elementis is the {name}.'.format(name = str(self.name)))
+
+# Create class for Game - will contain main bulk of code:
 
 class Game:
-    player_choice = ''
-    def __init__(self):
-        Game.journey_trigger(Player.name)
+    def __init__(self, player):
+        print(player)
+        Game.game_init(self, player)
 
-    def game_init():
-        player_input = input (start_command)
-        while player_input != 'start':
-            player_input = input (start_command)
+    def __repr__(self):
+        pass
+
+    def game_init(self, player):
+        print('''--> Is it time to start?
+        ''')
+        y_n = input ('--> Type Y/N and press enter: ')
+        while y_n != 'y' and y_n != 'n':
+             y_n = input ('--> Type Y/N and press enter: ')
         else:
-            player = 'Player 1'
-            Player(player)
+            Game.journey_trigger(self, player)
 
-    def journey_trigger(self):
-        print ('Now {name}, it is time to make your choice.'.format(name = self.name))
+    def journey_trigger(self, player):
+        print ('--> {name}, it is time to make your choice.'.format(name = player.name))
         print ( '''
             These are the Elementis of the Journey:
             - Cosmos
@@ -55,95 +94,143 @@ class Game:
             - Order
             You must make a selection for your own journey to begin.
             Choose wisely, it could effect your entire existence...''')
-        choice = input ('What do you choose? ')
-        while choice not in elementis_list:
-            choice = input ('You did not select one of the Elemetis. Choose again: ')
-        else:
-            Player.start_journey(choice)
+        start_choice = input ('--> What do you choose? ')
+        while start_choice not in elementis_dict.keys():
+            start_choice = input ('--> You did not select one of the Elementis. Choose again: ')
+        if start_choice == 'cosmos':
+            choice = cosmos
+            Game.start_journey(self, player_1, choice)
+        elif start_choice == 'flame':
+            choice = flame
+            Game.start_journey(self, player_1, choice)
+        elif start_choice == 'aqua':
+            choice = aqua
+            Game.start_journey(self, player_1, choice)
+        elif start_choice == 'mystic':
+            choice = mystic
+            Game.start_journey(self, player_1, choice)
+        elif start_choice == 'chaos':
+            choice = chaos
+            Game.start_journey(self, player_1, choice)
+        elif start_choice == 'order':
+            choice = order
+            Game.start_journey(self, player_1, choice)
             
-    def start_journey(self):
+    def start_journey(self, player, trigger_choice):
+        choice = trigger_choice
         print('''
-        Player {name} has decided to start the Journey with {choice}.
-        We will now begin the journey.'''.format(name = self.name, choice = self.choice))
-        answer = input ('Are you ready, {name}? Y/N'.format(name = self.name))
+        --> {name} has decided to start the Journey with {choice}.
+            We will now begin the journey.'''.format(name = player.name, choice = choice.name))
+        answer = input ('--> Are you ready, {name}? Y/N'.format(name = player.name))
         while answer != 'y' and answer != 'n':
-            answer = input ('Are you ready, {name}? Y/N'.format(name = self.name))
+            answer = input ('--> Are you ready, {name}? Y/N'.format(name = player.name))
         if answer == 'y':
-            Player.question_for_answer()
+            Game.question_for_answer(self, choice, player_1)
         else:
-            print('Fret not. When you are ready, return to start your Journey Through')
-    def question_for_answer(self):
-        pass
+            print('--> Fret not. When you are ready, return to start your Journey Through.')
+    def question_for_answer(self, choice):
+        print ('--> {question}'.format(question = choice.question))
+        print('''
+        -->> 1) {answer_1}
+        -->> 2) {answer_2}
+        -->> 3) {answer_3}
+        -->> 4) {answer_4}
+        '''.format(answer_1 = choice.answers[1], answer_2 = choice.answers[2], answer_3 = choice.answers[3], answer_4 = choice.answers[4]))
+        answer = input ('--> Choose a number and press enter: ')
+        if answer == choice.correct_answer:
+            Game.get_reward(self, choice)
+        else:
+            player_1.lose_a_life()
 
-# Create class for item storage for player during game:
-
-class Item_container:
-    def __init__(self):
-        self.container_name = Player.name+'\'s Item Container'
-        self.items = []
-
-# Create life container to hold life object for each player life during game:
-
-class Life_container:
-    pass
+    def get_reward(self, elementis):
+        elementis_list[elementis].reward()
 
 
-# Elemntis list and dict create:
 
-elementis_list = ['cosmos', 'flame', 'aqua', 'mystic', 'chaos', 'order']
+#Creat dict of Elementis for object inits:
 
 elementis_dict = {
-              'cosmos' : {'question' : 'Using modern sciences, is it possible to quantify the Cosmos completely?',
-                             'answers' : {1 : 'Yes, with the right instruments',
-                                          2 : 'Only partially',
-                                          3 : 'Impossible to quantify limitless',
-                                          4 : 'No, but one day'},
-                             'correct answer': '3',
-                             'reward' : 'An Origin of Journey'},
-              'flame' : {'question' : 'Can one find the source of the Healing Flame',
-                         'answers' : {1 : 'Yes, by exploring the cosmos',
-                                      2 : 'It is not found, but achieved',
-                                      3 : 'No',
-                                      4 : 'Yes, can be created by craftsman'},
-                         'correct answer' : '2',
-                         'reward' : 'Ember of Burning Spirit'},
-              'aqua' : {'question' : 'In the Waters of Forever, how does one survive?',
-                        'answers' : {1 : 'No survival, you will become one with it',
-                                     2 : 'Learn to breathe inside',
-                                     3 : 'Drink it all',
-                                     4 : 'Hold your breath'},
-                        'correct answer' : '1',
-                        'reward' : 'Drink of the One True'},
-              'mystic' : {'question' : 'In the Arcane, is there any limitation true?',
-                          'answers' : {1 : 'Yes, the Rule of Law',
-                                       2 : 'No, not according to the rules in place',
-                                       3 : 'Yes, spells contained in spellbooks',
-                                       4 : 'One can never be restricted if one\'s mind is endless'},
-                          'correct answer' : '4',
-                          'reward' : 'Enchantment of Expanse'},
-              'chaos' : {'question' : 'Was there ever truly order in the Expanse?',
-                         'answers' : {1 : 'Yes, all things have order',
-                                      2 : 'No, the ever changing cannot be ordered',
-                                      3 : 'No, we just believe there is',
-                                      4 : 'Yes, but only in the beginning'},
-                         'correct answer' : '2',
-                         'reward' : 'Flow of Chaos Arc'},
-              'order' : {'question' : 'All things have order, whilst nothing has none. Does any One Being see the Truth?',
-                         'answers' : {1 : 'Yes, everyone can if thhey look properly',
-                                      2 : 'No, how can one see the intangible?',
-                                      3 : 'Yes, make peace with Chaos to see Truth',
-                                      4 : 'Nothing ever truly exists to be ordered'},
-                         'correct answer' : '4',
-                         'reward' : 'Sight of Ordered Emptiness'}
+                        'cosmos' : {
+                            'name' : 'Cosmos',
+                            'question' : 'Using modern sciences, is it possible to quantify the Cosmos completely?',
+                                    'answers' : {1 : 'Yes, with the right instruments',
+                                                2 : 'Only partially',
+                                                3 : 'Impossible to quantify limitless',
+                                                4 : 'No, but one day'},
+                                    'correct answer': '3',
+                                    'reward' : 'An Origin of Journey'},
+                        'flame' : {
+                            'name' : 'Flame',
+                            'question' : 'Can one find the source of the Healing Flame?',
+                                    'answers' : {1 : 'Yes, by exploring the cosmos',
+                                                2 : 'It is not found, but achieved',
+                                                3 : 'No',
+                                                4 : 'Yes, can be created by craftsman'},
+                                    'correct answer' : '2',
+                                    'reward' : 'Ember of Burning Spirit'},
+                        'aqua' : {
+                            'name' : 'Aqua',
+                            'question' : 'In the Waters of Forever, how does one survive?',
+                                    'answers' : {1 : 'No survival, you will become one with it',
+                                                2 : 'Learn to breathe inside',
+                                                3 : 'Drink it all',
+                                                4 : 'Hold your breath'},
+                                    'correct answer' : '1',
+                                    'reward' : 'Drink of the One True'},
+                        'mystic' : {
+                            'name' : 'Mystic',
+                            'question' : 'In the Arcane, is there any limitation true?',
+                                    'answers' : {1 : 'Yes, the Rule of Law',
+                                                2 : 'No, not according to the rules in place',
+                                                3 : 'Yes, spells contained in spellbooks',
+                                                4 : 'One can never be restricted if one\'s mind is endless'},
+                                    'correct answer' : '4',
+                                    'reward' : 'Enchantment of Expanse'},
+                        'chaos' : {
+                            'name' : 'Chaos',
+                            'question' : 'Was there ever truly order in the Expanse?',
+                                    'answers' : {1 : 'Yes, all things have order',
+                                                2 : 'No, the ever changing cannot be ordered',
+                                                3 : 'No, we just believe there is',
+                                                4 : 'Yes, but only in the beginning'},
+                                    'correct answer' : '2',
+                                    'reward' : 'Flow of Chaos Arc'},
+                        'order' : {
+                            'name' : 'Order',
+                            'question' : 'All things have order, whilst nothing has none. Does any One Being see the Truth?',
+                                    'answers' : {1 : 'Yes, everyone can if thhey look properly',
+                                                2 : 'No, how can one see the intangible?',
+                                                3 : 'Yes, make peace with Chaos to see Truth',
+                                                4 : 'Nothing ever truly exists to be ordered'},
+                                    'correct answer' : '4',
+                                    'reward' : 'Sight of Ordered Emptiness'}
                     }
-
 # Base code for dict quick create template - copy and paste.
-base_code = {'question' : '', 'answers' : {1 : '', 2 : '', 3 : '', 4 : ''}, 'correct answer' : '', 'reward' : ''}
+base_code = {'name' : '', 'question' : '', 'answers' : {1 : '', 2 : '', 3 : '', 4 : ''}, 'correct answer' : '', 'reward' : ''}
 
-# Global variables for setup:
-start_command = 'Type "start" to begin a new game: '
+# Initiate Elementis and create list - initiate new and add as necessary (if needed):
+
+cosmos = Elementis('cosmos')
+flame = Elementis('flame')
+aqua = Elementis('aqua')
+mystic = Elementis('mystic')
+chaos = Elementis('chaos')
+order = Elementis('order')
+
+elementis_list = [cosmos, flame, aqua, mystic, chaos, order]
+
+
+
+
+# Game run commands:
+
+name_start = programme_start()
+player_1 = Player(name_start)
+
+new_game = Game(player_1)
 
 # Test run through using new player instance:
-Game.game_init()
 
-
+#for elementis in elementis_list:
+#    print(elementis)
+#    print(elementis.name)
