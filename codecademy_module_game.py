@@ -39,6 +39,7 @@ class Player:
     def get_reward(self, elementis):
         print('--> Your reward for this is {reward}'.format(reward = elementis.reward))
         player_1.item_container.append(elementis.reward)
+        print('--> Your item container now holds {items}.'.format(items = player_1.item_container))
 
     def store_reward(self, elementis_reward):
         self.items.append(elementis_reward)
@@ -48,7 +49,7 @@ class Player:
         if self.life > 0:
             print('''
             --> That is not the correct answer.
-                You now have {lives} lives remaining.'.format(lives = self.life)''')
+                You now have {lives} lives remaining.'''.format(lives = self.life))
         else:
             print('''
             --> GAME OVER!
@@ -72,7 +73,7 @@ class Elementis:
 class Game:
     
     def __init__(self, player):
-        self.game_elementis_list = elementis_list
+        self.game_elementis_list = ['cosmos', 'flame', 'aqua', 'mystic', 'chaos', 'order']
         self.correctly_answered = []
         self.incorrectly_answered = []
         self.ask_again = []
@@ -88,6 +89,7 @@ class Game:
         while y_n != 'y' and y_n != 'n':
              y_n = input ('--> Type Y/N and press enter: ')
         if y_n == 'n':
+            print ('--> Come back when you are ready, for the Journey.')
             quit()
         else:
             Game.journey_trigger(self, player)
@@ -162,19 +164,36 @@ class Game:
         player_1.get_reward(elementis)
         self.correctly_answered.append(elementis.name)
         next_elementis = Game.elementis_rand_select(self, elementis)
-        Game.next_question(self, next_elementis)
+        Game.ask_question(self, next_elementis)
 
     def wrong_answer(self, elementis):
         print('--> Oh no! You have chosen the wrong answer!')
         player_1.lose_a_life()
         self.incorrectly_answered.append(elementis.name)
-        self.ask_again.append(elementis.name)
-        next_elementis = Game.elementis_rand_select(elementis)
-        Game.next_question(self, next_elementis)
+        self.ask_again.append(elementis.name.lower())
+        next_elementis = Game.elementis_rand_select(self, elementis)
+        Game.ask_question(self, next_elementis)
 
     def elementis_rand_select(self, elementis):
-        self.game_elementis_list.pop(elementis)
-        random.randint(range(len(self.game_elementis_list)))
+        self.game_elementis_list.remove(elementis.name.lower())
+        if self.game_elementis_list == []:
+            for x in self.ask_again:
+                self.ask_again.pop(x)
+                self.game_elementis_list.append(x)
+        next_elementis = random.choice(self.game_elementis_list)
+        if next_elementis == 'cosmos':
+            return cosmos
+        elif next_elementis == 'flame':
+            return flame
+        elif next_elementis == 'aqua':
+            return aqua
+        elif next_elementis == 'mystic':
+            return mystic
+        elif next_elementis == 'chaoos':
+            return chaos
+        elif next_elementis == 'order':
+            return order
+        
 
 #Creat dict of Elementis for object inits:
 
