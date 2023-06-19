@@ -40,6 +40,8 @@ class Player:
         print('--> Your reward for this is {reward}'.format(reward = elementis.reward))
         player_1.item_container.append(elementis.reward)
         print('--> Your item container now holds {items}.'.format(items = player_1.item_container))
+        if len(self.item_container) == 6:
+            Game.win_game(self)
 
     def store_reward(self, elementis_reward):
         self.items.append(elementis_reward)
@@ -75,8 +77,6 @@ class Game:
     def __init__(self, player):
         self.game_elementis_list = ['cosmos', 'flame', 'aqua', 'mystic', 'chaos', 'order']
         self.correctly_answered = []
-        self.incorrectly_answered = []
-        self.ask_again = []
         print(player)
         Game.game_init(self, player)
 
@@ -140,6 +140,24 @@ class Game:
             Game.ask_question(self, choice)
         else:
             print('--> Fret not. When you are ready, return to start your Journey Through.')
+    
+    def win_game(player):
+        if player_1.life == 10:
+            print('''
+            --> You have mastered the Elementis and completed your Journey Through.
+                Go forth and seek.''')
+            quit()
+        elif player_1.life == 1:
+            print('''
+            --> You end your Journey Through with one life only.
+                This is the life you should live, now experience the Journey of a Single Life.''')
+            quit()
+        else:
+            print('''
+            --> Congratulations you have completed the Journey.
+                If ever you are lost, return to A Journey Through again to find a path.''')
+            quit()
+
     def ask_question(self, elementis):
         print ('--> {question}'.format(question = elementis.question))
         print('''
@@ -157,29 +175,23 @@ class Game:
         if answer == elementis.correct_answer:
             Game.correct_answer(self, elementis)
         else:
-            Game.wrong_answer(self, elementis)
+            Game.wrong_answer(self)
 
     def correct_answer(self, elementis):
         print('--> Well done! You have chosen the correct answer!')
         player_1.get_reward(elementis)
         self.correctly_answered.append(elementis.name)
-        next_elementis = Game.elementis_rand_select(self, elementis)
+        self.game_elementis_list.remove(elementis.name.lower())
+        next_elementis = Game.elementis_rand_select(self)
         Game.ask_question(self, next_elementis)
 
-    def wrong_answer(self, elementis):
+    def wrong_answer(self):
         print('--> Oh no! You have chosen the wrong answer!')
         player_1.lose_a_life()
-        self.incorrectly_answered.append(elementis.name)
-        self.ask_again.append(elementis.name.lower())
-        next_elementis = Game.elementis_rand_select(self, elementis)
+        next_elementis = Game.elementis_rand_select(self)
         Game.ask_question(self, next_elementis)
 
-    def elementis_rand_select(self, elementis):
-        self.game_elementis_list.remove(elementis.name.lower())
-        if self.game_elementis_list == []:
-            for x in self.ask_again:
-                self.ask_again.pop(x)
-                self.game_elementis_list.append(x)
+    def elementis_rand_select(self):
         next_elementis = random.choice(self.game_elementis_list)
         if next_elementis == 'cosmos':
             return cosmos
@@ -267,7 +279,7 @@ order = Elementis('order')
 elementis_list = [cosmos, flame, aqua, mystic, chaos, order]
 
 
-# Object instance creation:
+# Object instance creation to run terminal game:
 
 name_start = programme_start()
 player_1 = Player(name_start)
