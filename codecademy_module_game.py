@@ -5,8 +5,6 @@
 
 import random
 
-
-
 def programme_start():
     player_name = ''
     input_start = input ('--> Type "start" and press enter to begin a new game: ')
@@ -38,13 +36,22 @@ class Player:
             Once it has been loaded with all items of the Elementis, you shall see the Truths of the Elementis.
         '''.format(name = self.name, life = self.life, number = len(self.item_container)))
 
+    def get_reward(self, elementis):
+        print('--> Your reward for this is {reward}'.format(reward = elementis.reward))
+        player_1.item_container.append(elementis.reward)
+        print('--> Your item container now holds {items}.'.format(items = player_1.item_container))
+        if len(self.item_container) == 6:
+            Game.win_game(self)
+
     def store_reward(self, elementis_reward):
         self.items.append(elementis_reward)
 
     def lose_a_life(self):
         self.life -= 1
         if self.life > 0:
-            print('--> You now have {lives} lives remaining.'.format(lives = self.life))
+            print('''
+            --> That is not the correct answer.
+                You now have {lives} lives remaining.'''.format(lives = self.life))
         else:
             print('''
             --> GAME OVER!
@@ -66,7 +73,10 @@ class Elementis:
 # Create class for Game - will contain main bulk of code:
 
 class Game:
+    
     def __init__(self, player):
+        self.game_elementis_list = ['cosmos', 'flame', 'aqua', 'mystic', 'chaos', 'order']
+        self.correctly_answered = []
         print(player)
         Game.game_init(self, player)
 
@@ -74,11 +84,13 @@ class Game:
         pass
 
     def game_init(self, player):
-        print('''--> Is it time to start?
-        ''')
+        print('--> Is it time to start?')
         y_n = input ('--> Type Y/N and press enter: ')
         while y_n != 'y' and y_n != 'n':
              y_n = input ('--> Type Y/N and press enter: ')
+        if y_n == 'n':
+            print ('--> Come back when you are ready, for the Journey.')
+            quit()
         else:
             Game.journey_trigger(self, player)
 
@@ -98,54 +110,102 @@ class Game:
         while start_choice not in elementis_dict.keys():
             start_choice = input ('--> You did not select one of the Elementis. Choose again: ')
         if start_choice == 'cosmos':
-            choice = cosmos
-            Game.start_journey(self, player_1, choice)
+            elementis = cosmos
+            Game.start_journey(self, player_1, elementis)
         elif start_choice == 'flame':
-            choice = flame
-            Game.start_journey(self, player_1, choice)
+            elementis = flame
+            Game.start_journey(self, player_1, elementis)
         elif start_choice == 'aqua':
-            choice = aqua
-            Game.start_journey(self, player_1, choice)
+            elementis = aqua
+            Game.start_journey(self, player_1, elementis)
         elif start_choice == 'mystic':
-            choice = mystic
-            Game.start_journey(self, player_1, choice)
+            elementis = mystic
+            Game.start_journey(self, player_1, elementis)
         elif start_choice == 'chaos':
-            choice = chaos
-            Game.start_journey(self, player_1, choice)
+            elementis = chaos
+            Game.start_journey(self, player_1, elementis)
         elif start_choice == 'order':
-            choice = order
-            Game.start_journey(self, player_1, choice)
+            elementis = order
+            Game.start_journey(self, player_1, elementis)
             
     def start_journey(self, player, trigger_choice):
         choice = trigger_choice
         print('''
         --> {name} has decided to start the Journey with {choice}.
             We will now begin the journey.'''.format(name = player.name, choice = choice.name))
-        answer = input ('--> Are you ready, {name}? Y/N'.format(name = player.name))
+        answer = input ('--> Are you ready, {name}? Y/N: '.format(name = player.name))
         while answer != 'y' and answer != 'n':
-            answer = input ('--> Are you ready, {name}? Y/N'.format(name = player.name))
+            answer = input ('--> Are you ready, {name}? Y/N: '.format(name = player.name))
         if answer == 'y':
-            Game.question_for_answer(self, choice, player_1)
+            Game.ask_question(self, choice)
         else:
             print('--> Fret not. When you are ready, return to start your Journey Through.')
-    def question_for_answer(self, choice):
-        print ('--> {question}'.format(question = choice.question))
+    
+    def win_game(player):
+        if player_1.life == 10:
+            print('''
+            --> You have mastered the Elementis and completed your Journey Through.
+                Go forth and seek.''')
+            quit()
+        elif player_1.life == 1:
+            print('''
+            --> You end your Journey Through with one life only.
+                This is the life you should live, now experience the Journey of a Single Life.''')
+            quit()
+        else:
+            print('''
+            --> Congratulations you have completed the Journey.
+                If ever you are lost, return to A Journey Through again to find a path.''')
+            quit()
+
+    def ask_question(self, elementis):
+        print ('--> {question}'.format(question = elementis.question))
         print('''
         -->> 1) {answer_1}
         -->> 2) {answer_2}
         -->> 3) {answer_3}
         -->> 4) {answer_4}
-        '''.format(answer_1 = choice.answers[1], answer_2 = choice.answers[2], answer_3 = choice.answers[3], answer_4 = choice.answers[4]))
+        '''.format(answer_1 = elementis.answers[1],
+                   answer_2 = elementis.answers[2],
+                   answer_3 = elementis.answers[3],
+                   answer_4 = elementis.answers[4]))
         answer = input ('--> Choose a number and press enter: ')
-        if answer == choice.correct_answer:
-            Game.get_reward(self, choice)
+        while answer == '':
+            answer = input ('--> Choose a number and press enter: ')
+        if answer == elementis.correct_answer:
+            Game.correct_answer(self, elementis)
         else:
-            player_1.lose_a_life()
+            Game.wrong_answer(self)
 
-    def get_reward(self, elementis):
-        elementis_list[elementis].reward()
+    def correct_answer(self, elementis):
+        print('--> Well done! You have chosen the correct answer!')
+        player_1.get_reward(elementis)
+        self.correctly_answered.append(elementis.name)
+        self.game_elementis_list.remove(elementis.name.lower())
+        next_elementis = Game.elementis_rand_select(self)
+        Game.ask_question(self, next_elementis)
 
+    def wrong_answer(self):
+        print('--> Oh no! You have chosen the wrong answer!')
+        player_1.lose_a_life()
+        next_elementis = Game.elementis_rand_select(self)
+        Game.ask_question(self, next_elementis)
 
+    def elementis_rand_select(self):
+        next_elementis = random.choice(self.game_elementis_list)
+        if next_elementis == 'cosmos':
+            return cosmos
+        elif next_elementis == 'flame':
+            return flame
+        elif next_elementis == 'aqua':
+            return aqua
+        elif next_elementis == 'mystic':
+            return mystic
+        elif next_elementis == 'chaoos':
+            return chaos
+        elif next_elementis == 'order':
+            return order
+        
 
 #Creat dict of Elementis for object inits:
 
@@ -216,21 +276,12 @@ aqua = Elementis('aqua')
 mystic = Elementis('mystic')
 chaos = Elementis('chaos')
 order = Elementis('order')
-
 elementis_list = [cosmos, flame, aqua, mystic, chaos, order]
 
 
-
-
-# Game run commands:
+# Object instance creation to run terminal game:
 
 name_start = programme_start()
 player_1 = Player(name_start)
-
 new_game = Game(player_1)
 
-# Test run through using new player instance:
-
-#for elementis in elementis_list:
-#    print(elementis)
-#    print(elementis.name)
